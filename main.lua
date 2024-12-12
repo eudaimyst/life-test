@@ -4,6 +4,7 @@
 --
 -- inspired by Max
 -- I doubt I will get the time to finish this
+-- one solwara
 --
 -----------------------------------------------------------------------------------------
 -- this is a comment
@@ -11,7 +12,8 @@
 print("Hello World")
 --create a grid of pixels, 10k by 10k
 local grid = {}
-local gridSize = 500
+local gridSize = 200
+local pixelSize = 2
 local deltaTime = 0
 local oldTime = 0
 local frameTime = 0
@@ -20,28 +22,35 @@ local i, j = 1, 1
 
 --solar2d update function
 
-function update()
+print('start')
+local generating = true
 
--- Your code here
-    --get current time in ms
-    -- add pixels to the grid
-    print(frameTime)
-    while frameTime < 500 do
+
+function generatePixels()
+    while (frameTime < 1000) and (i <= gridSize) do
+        --print('ij', i, j)
+        --get delta time using solar2d event
+        frameTime = frameTime + deltaTime
         if j < gridSize then
-            deltaTime = oldTime - system.getTimer()
-            frameTime = frameTime + deltaTime
-            print('startloop')
+           j = j + 1
+           display.newRect(i*pixelSize, j*pixelSize, pixelSize, pixelSize )
+        else 
+            j = 1
             i = i + 1
-            grid[i] = {}
-            if i > gridSize then
-                i = 1
-                j = j + 1
-                grid[i][j] =display.newRect(i, j, 1, 1)
-            end
         end
     end
+    if i > gridSize then
+        print('done')
+    end
+end
+
+function update()
+    deltaTime = system.getTimer() - oldTime
+    if (generating) then
+        generatePixels()
+    end
     frameTime = 0
-    oldTime = time
+    oldTime = system.getTimer()
 end
 
 Runtime:addEventListener( "enterFrame", update )
