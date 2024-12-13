@@ -7,6 +7,11 @@ function M.Create(y, x)
     block.y = y
     block.rect = display.newRect(x * c.blockW, y * c.blockH, c.blockW, c.blockH)
     block.fillColor = {0, 0, 0}
+    block.neighbours = {}
+    --for each side of the block, add the block to the neighbours table
+    for k, _ in pairs(c.sides) do
+        block.neighbours[k] = {}
+    end
 
     block.setColor = function(self, color, drawText)
         self.rect:setFillColor(unpack(color))
