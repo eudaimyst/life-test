@@ -24,6 +24,7 @@ assignedBlockCount = 0
 
 local function updateAssignedBlockCount()
     --for each source block, increment the assignedBlockCount
+    assignedBlockCount = 0
     for _, sourceBlockType in pairs(sourceBlocks) do
         assignedBlockCount = assignedBlockCount + #sourceBlockType
     end
@@ -102,7 +103,7 @@ local function spreadBlockTypes()
 
     while (frameTime < 1000 and assignedBlockCount <= (c.gridSize * c.gridSize)) do
         updateAssignedBlockCount()
-        print("assignedBlockCount", assignedBlockCount)
+        --print("assignedBlockCount", assignedBlockCount)
         --get delta time using solar2d event
         frameTime = frameTime + deltaTime
         --pick a random source block type, spread to the neighbours of a random source block
@@ -122,6 +123,7 @@ local function spreadBlockTypes()
     end
     if assignedBlockCount >= (c.gridSize * c.gridSize) then
         spreading = false
+        print("spreading complete")
     end
 end
 
