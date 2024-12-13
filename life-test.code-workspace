@@ -4,5 +4,10 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"editor.defaultFormatter": "trixnz.vscode-lua",
+		"[lua]": {
+			"editor.defaultFormatter": "trixnz.vscode-lua"
+		}
+	}
 }

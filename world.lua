@@ -14,8 +14,15 @@ local lushEarth = {50 / 255, 205 / 255, 50 / 255}
 local water = {30 / 255, 144 / 255, 255 / 255}
 local black = {.1, .1, .1}
 
+local sourceBlocks = {
+    ["barren"] = {},
+    ["lush"] = {},
+    ["water"] = {}
+}
+
 print("start")
 local generating = true
+local spreading = false
 
 local function generateBlocks()
     while (frameTime < 1000) and (i <= c.gridSize) do
@@ -23,12 +30,12 @@ local function generateBlocks()
         --get delta time using solar2d event
         frameTime = frameTime + deltaTime
         if j <= c.gridSize then
-            j = j + 1
             if grid[i] == nil then
                 grid[i] = {}
             end
             grid[i][j] = block.Create(i, j)
-            grid[i][j]:setColor(black)
+            grid[i][j]:setColor(c.colors["black"])
+            j = j + 1
         else
             j = 1
             i = i + 1
@@ -39,47 +46,45 @@ local function generateBlocks()
     end
 end
 
-local function setBlockTypes()
+local function setSourceBlocks()
     print("setting node Blocks")
     --set 10 random Blocks to water, barren earth and lush earth respectively
     local function setBlocks(colorType)
         for i = 1, 10 do
-            local x = math.random(1, c.gridSize-1)
-            local y = math.random(1, c.gridSize-1)
-            grid[x][y]:setColor(colorType)
+            local x = math.random(1, c.gridSize)
+            local y = math.random(1, c.gridSize)
+            --print(c.colors[colorType])
+            print(x, y)
+            grid[y][x]:setColor(c.colors[colorType], true)
+            sourceBlocks[colorType][#sourceBlocks[colorType] + 1] = grid[x][y]
         end
     end
-    setBlocks(water)
-    setBlocks(barrenEarth)
-    setBlocks(lushEarth)
+    setBlocks("water")
+    setBlocks("barren")
+    setBlocks("lush")
 end
 
-local function expandBlockTypes()
+local function spreadBlockTypes()
     print("expanding nodes")
-    --expand the water, barren earth and lush earth Blocks
-    local function expandBlocks(colorType)
-        for i = 1, c.gridSize do
-            for j = 1, c.gridSize do
-                if grid[i][j].getColor() == colorType then
-                    if i > 1 then
-                        grid[i - 1][j]:setColor(colorType)
-                    end
-                    if i < c.gridSize then
-                        grid[i + 1][j]:setColor(colorType)
-                    end
-                    if j > 1 then
-                        grid[i][j - 1]:setColor(colorType)
-                    end
-                    if j < c.gridSize then
-                        grid[i][j + 1]:setColor(colorType)
+    --expand the water, barren earth and lush earth Blocks radially
+    --for each block in the sourceBlocks, set the color of the block on each side (including diagonally) to the same as the source
+    for i = 1, 10 do
+        for k, v in pairs(sourceBlocks) do
+            --check all the surrounding blocks of the source block to see if they are not black
+            for _, block in pairs(v) do
+                for _, side in pairs(c.sides) do
+                    local x = block.x + side.x
+                    local y = block.y + side.y
+                    if x > 0 and x <= c.gridSize and y > 0 and y <= c.gridSize then
+                        if grid[y][x]:getColor() == c.colors["black"] then
+                            grid[y][x]:setColor(c.colors[k], true)
+                            sourceBlocks[k][#sourceBlocks[k] + 1] = grid[y][x]
+                        end
                     end
                 end
             end
         end
     end
-    expandBlocks(water)
-    expandBlocks(barrenEarth)
-    expandBlocks(lushEarth)
 end
 
 local function update()
@@ -88,9 +93,12 @@ local function update()
         generateBlocks()
         if not generating then
             print("done generating")
-            setBlockTypes()
-            expandBlockTypes()
+            setSourceBlocks()
+            spreading = true
         end
+    end
+    if (spreading) then
+        spreadBlockTypes()
     end
     frameTime = 0
     oldTime = system.getTimer()
