@@ -17,4 +17,4 @@
 local world = require("world")
 
 print("Hello World")
-world.beginGen()
+world.BeginGen()

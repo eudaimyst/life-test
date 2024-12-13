@@ -1,8 +1,8 @@
 local M = {}
+local c = require("const")
+local block = require("block")
 
 local grid = {}
-local gridSize = 100
-local blockSize = 6
 local deltaTime = 0
 local oldTime = 0
 local frameTime = 0
@@ -18,24 +18,23 @@ print("start")
 local generating = true
 
 local function generateBlocks()
-    while (frameTime < 1000) and (i <= gridSize) do
+    while (frameTime < 1000) and (i <= c.gridSize) do
         --print('ij', i, j)
         --get delta time using solar2d event
         frameTime = frameTime + deltaTime
-        if j <= gridSize then
+        if j <= c.gridSize then
             j = j + 1
             if grid[i] == nil then
                 grid[i] = {}
             end
-            grid[i][j] = display.newRect(i * blockSize, j * blockSize, blockSize, blockSize)
-            grid[i][j]:setFillColor(unpack(black))
-            grid[x][y].fillColor = unpack(black)
+            grid[i][j] = block.Create(i, j)
+            grid[i][j]:setColor(black)
         else
             j = 1
             i = i + 1
         end
     end
-    if i > gridSize then
+    if i > c.gridSize then
         generating = false
     end
 end
@@ -45,10 +44,9 @@ local function setBlockTypes()
     --set 10 random Blocks to water, barren earth and lush earth respectively
     local function setBlocks(colorType)
         for i = 1, 10 do
-            local x = math.random(1, gridSize)
-            local y = math.random(1, gridSize)
-            grid[x][y]:setFillColor(unpack(colorType))
-            grid[x][y].fillColor = unpack(colorType)
+            local x = math.random(1, c.gridSize-1)
+            local y = math.random(1, c.gridSize-1)
+            grid[x][y]:setColor(colorType)
         end
     end
     setBlocks(water)
@@ -60,20 +58,20 @@ local function expandBlockTypes()
     print("expanding nodes")
     --expand the water, barren earth and lush earth Blocks
     local function expandBlocks(colorType)
-        for i = 1, gridSize do
-            for j = 1, gridSize do
-                if grid[i][j].fillColor == colorType then
+        for i = 1, c.gridSize do
+            for j = 1, c.gridSize do
+                if grid[i][j].getColor() == colorType then
                     if i > 1 then
-                        grid[i - 1][j]:setFillColor(unpack(colorType))
+                        grid[i - 1][j]:setColor(colorType)
                     end
-                    if i < gridSize then
-                        grid[i + 1][j]:setFillColor(unpack(colorType))
+                    if i < c.gridSize then
+                        grid[i + 1][j]:setColor(colorType)
                     end
                     if j > 1 then
-                        grid[i][j - 1]:setFillColor(unpack(colorType))
+                        grid[i][j - 1]:setColor(colorType)
                     end
-                    if j < gridSize then
-                        grid[i][j + 1]:setFillColor(unpack(colorType))
+                    if j < c.gridSize then
+                        grid[i][j + 1]:setColor(colorType)
                     end
                 end
             end
@@ -98,7 +96,7 @@ local function update()
     oldTime = system.getTimer()
 end
 
-function M.beginGen()
+function M.BeginGen()
     Runtime:addEventListener("enterFrame", update)
 end
 
