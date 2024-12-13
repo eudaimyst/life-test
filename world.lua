@@ -1,4 +1,5 @@
 local M = {}
+local json = require "json"
 local c = require("const")
 local block = require("block")
 
@@ -19,6 +20,13 @@ local sourceBlocks = {
     ["barren"] = {},
     ["lush"] = {},
     ["water"] = {}
+}
+local spreadTypeCount = 1 --for iterating the block types when spreading
+local spreadCount = {
+    --for iterating through the sourceBlocks
+    ["barren"] = 1,
+    ["lush"] = 1,
+    ["water"] = 1
 }
 assignedBlockCount = 0
 
@@ -98,7 +106,7 @@ local function setSourceBlocks()
 end
 
 local function spreadBlockTypes()
-    print("expanding nodes")
+    --print("expanding nodes")
     --pick a random source block
 
     while (frameTime < 1000 and assignedBlockCount <= (c.gridSize * c.gridSize)) do
@@ -107,18 +115,54 @@ local function spreadBlockTypes()
         --get delta time using solar2d event
         frameTime = frameTime + deltaTime
         --pick a random source block type, spread to the neighbours of a random source block
-        local sourceBlockType = sourceBlockTypes[math.random(1, 3)]
-        local sourceBlock = sourceBlocks[sourceBlockType][math.random(1, #sourceBlocks[sourceBlockType])]
+        local sourceBlockType = sourceBlockTypes[spreadTypeCount]
+        print(sourceBlockType, spreadCount[sourceBlockType])
+        --print(json.prettify(sourceBlocks))
+        --local sourceBlock = sourceBlocks[sourceBlockType][spreadCount]
+
+        local count = spreadCount[sourceBlockType]
+        local sourceList = sourceBlocks[sourceBlockType]
+
+        -- Ensure sourceBlocks[sourceBlockType] is not nil or empty
+        if not sourceList or #sourceList == 0 then
+            print("Error: No blocks available for type", sourceBlockType)
+            return
+        end
+
+        -- Ensure count is within bounds
+        if count > #sourceList then
+            print("Error: spreadCount out of bounds for type", sourceBlockType)
+            spreadCount[sourceBlockType] = 1 -- Reset to 1 or handle appropriately
+            count = 1
+        end
+
+        -- Access the source block
+        local sourceBlock = sourceList[count]
+        if not sourceBlock then
+            print("Error: sourceBlock is nil despite checks")
+        else
+            print("Successfully accessed sourceBlock:", sourceBlock)
+        end
+
         local sourceBlockNeighbours = sourceBlock.neighbours
         --set the block type of the neighbours of the source block
-        for sideKey, side in pairs(c.sides) do
-            local neighbour = sourceBlockNeighbours[sideKey][1]
-            if neighbour ~= nil then
-                local neighbourColor = neighbour:getColor()
-                if neighbourColor == c.colors["black"] then
-                    setBlockType(neighbour, sourceBlockType)
+        if (not sourceBlock.hasBeenSpread) then
+            --print("source block has been spread")
+            for sideKey, side in pairs(c.sides) do
+                local neighbour = sourceBlockNeighbours[sideKey][1]
+                if neighbour ~= nil then
+                    local neighbourColor = neighbour:getColor()
+                    if neighbourColor == c.colors["black"] then
+                        setBlockType(neighbour, sourceBlockType)
+                    end
                 end
+                sourceBlock.hasBeenSpread = true
             end
+        end
+        spreadCount[sourceBlockType] = spreadCount[sourceBlockType] + 1
+        spreadTypeCount = spreadTypeCount + 1
+        if spreadTypeCount > 3 then
+            spreadTypeCount = 1
         end
     end
     if assignedBlockCount >= (c.gridSize * c.gridSize) then

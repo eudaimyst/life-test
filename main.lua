@@ -15,6 +15,6 @@
 
 --import world module
 local world = require("world")
-
+math.randomseed(os.time())
 print("Hello World")
 world.BeginGen()

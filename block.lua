@@ -5,6 +5,7 @@ function M.Create(y, x)
     local block = {}
     block.x = x
     block.y = y
+    block.hasBeenSpread = false
     block.rect = display.newRect(x * c.blockW, y * c.blockH, c.blockW, c.blockH)
     block.fillColor = {0, 0, 0}
     block.neighbours = {}
