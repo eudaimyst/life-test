@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.defaultFormatter": "trixnz.vscode-lua",
+		"[lua]": {
+			"editor.defaultFormatter": "trixnz.vscode-lua"
+		}
+	}
+}
