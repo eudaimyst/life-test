@@ -18,7 +18,6 @@ function M.Create(y, x)
         self.rect:setFillColor(unpack(color))
         self.fillColor = color
         if drawText then
-        --[[
             block.debugText =
                 display.newText(
                 ((self.x) .. ", " .. (self.y)),
@@ -27,7 +26,6 @@ function M.Create(y, x)
                 native.systemFont,
                 10
             )
-        ]]
         end
     end
 

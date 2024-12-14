@@ -71,7 +71,7 @@ local function setNeighbours()
                 local x = i + side.x
                 local y = j + side.y
                 if x > 0 and x <= c.gridSize and y > 0 and y <= c.gridSize then
-                    grid[i][j].neighbours[sideKey][1] = grid[y][x]
+                    grid[i][j].neighbours[sideKey][1] = grid[x][y]
                 --print("seting neighbour for ", i, j)
                 --print("for sidekey", sideKey, "to", x, y)
                 end
@@ -81,8 +81,8 @@ local function setNeighbours()
     print("done setting neighbours")
 end
 
-local function setBlockType(block, blockType)
-    block:setColor(c.colors[blockType], false)
+local function setBlockType(block, blockType, debugpos)
+    block:setColor(c.colors[blockType], debugpos)
     sourceBlocks[blockType][#sourceBlocks[blockType] + 1] = block
 end
 
@@ -91,11 +91,11 @@ local function setSourceBlocks()
     --set 10 random Blocks to water, barren earth and lush earth respectively
     local function setBlocks(colorType)
         for i = 1, 10 do
-            local x = math.random(1, c.gridSize)
-            local y = math.random(1, c.gridSize)
+            local x = math.floor(math.random(100, c.gridSize * 100) / 100)
+            local y = math.floor(math.random(100, c.gridSize * 100) / 100)
             --print(c.colors[colorType])
             print(x, y)
-            setBlockType(grid[x][y], colorType)
+            setBlockType(grid[x][y], colorType, true)
             --grid[y][x]:setColor(c.colors[colorType], true)
             --sourceBlocks[colorType][#sourceBlocks[colorType] + 1] = grid[x][y]
         end
@@ -116,9 +116,7 @@ local function spreadBlockTypes()
         frameTime = frameTime + deltaTime
         --pick a random source block type, spread to the neighbours of a random source block
         local sourceBlockType = sourceBlockTypes[spreadTypeCount]
-        print(sourceBlockType, spreadCount[sourceBlockType])
-        --print(json.prettify(sourceBlocks))
-        --local sourceBlock = sourceBlocks[sourceBlockType][spreadCount]
+        --print(sourceBlockType, spreadCount[sourceBlockType])
 
         local count = spreadCount[sourceBlockType]
         local sourceList = sourceBlocks[sourceBlockType]
@@ -141,7 +139,7 @@ local function spreadBlockTypes()
         if not sourceBlock then
             print("Error: sourceBlock is nil despite checks")
         else
-            print("Successfully accessed sourceBlock:", sourceBlock)
+            --print("Successfully accessed sourceBlock:", sourceBlock)
         end
 
         local sourceBlockNeighbours = sourceBlock.neighbours
