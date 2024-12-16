@@ -14,7 +14,12 @@
 -- log to the cosnole using solar2d
 
 --import world module
-local world = require("world")
+local world = require("modules.world")
+local sim = require("modules.sim")
 math.randomseed(os.time())
 print("Hello World")
-world.BeginGen()
+local function genComplete()
+    print("Generation Complete")
+    sim.BeginUpdate()
+end
+world.BeginGen(genComplete)

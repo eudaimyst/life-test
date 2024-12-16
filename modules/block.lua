@@ -1,5 +1,5 @@
 local M = {}
-local c = require("const")
+local c = require("modules.const")
 
 function M.Create(y, x)
     local block = {}

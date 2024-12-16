@@ -1,7 +1,9 @@
 local M = {}
 local json = require "json"
-local c = require("const")
-local block = require("block")
+local c = require("modules.const")
+local block = require("modules.block")
+
+local genCompleteCallback = nil
 
 local grid = {}
 local deltaTime = 0
@@ -166,6 +168,10 @@ local function spreadBlockTypes()
     if assignedBlockCount >= (c.gridSize * c.gridSize) then
         spreading = false
         print("spreading complete")
+        if genCompleteCallback then
+            Runtime:removeEventListener("enterFrame", update)
+            genCompleteCallback()
+        end
     end
 end
 
@@ -175,6 +181,7 @@ local function update()
         generateBlocks()
         if not generating then
             print("done generating")
+            --remove event listener
             setNeighbours()
             setSourceBlocks()
             spreading = true
@@ -187,8 +194,9 @@ local function update()
     oldTime = system.getTimer()
 end
 
-function M.BeginGen()
+function M.BeginGen(callback)
     Runtime:addEventListener("enterFrame", update)
+    genCompleteCallback = callback
 end
 
 return M
