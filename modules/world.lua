@@ -6,6 +6,7 @@ local block = require("modules.block")
 local genCompleteCallback = nil
 
 local grid = {}
+M.grid = grid
 local deltaTime = 0
 local oldTime = 0
 local frameTime = 0

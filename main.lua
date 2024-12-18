@@ -3,8 +3,6 @@
 -- main.lua
 --
 -- inspired by Max
--- I doubt I will get the time to finish this
--- one solwara
 --
 -- built with Solar2D
 -- credit: chatGPT, Github Copilot
@@ -16,10 +14,13 @@
 --import world module
 local world = require("modules.world")
 local sim = require("modules.sim")
+local ui = require("modules.ui")
+--initialize the ui
 math.randomseed(os.time())
 print("Hello World")
 local function genComplete()
     print("Generation Complete")
     sim.BeginUpdate()
+    ui.init()
 end
 world.BeginGen(genComplete)
